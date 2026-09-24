@@ -85,10 +85,14 @@ Skill আর rule-এর নির্দেশগুলো মডেলের �
 
 ## ইনস্টল
 
-**দরকার:** Python 3.8 বা নতুন সংস্করণ। স্ক্রিপ্ট, hooks আর installer-এর জন্য লাগবে। না থাকলে নিচের "হাতে ইনস্টল" অংশ দেখুন।
+**দরকার:** Python 3.8 বা নতুন সংস্করণ। স্ক্রিপ্ট, hooks আর installer-এর জন্য লাগবে। আছে কি না দেখতে PowerShell-এ `py --version` (Mac-এ Terminal-এ `python3 --version`) লিখুন। না থাকলে [python.org](https://www.python.org/downloads/) থেকে ইনস্টল করুন, আর ইনস্টলের সময় "Add python.exe to PATH"-এ টিক দিন। Python ছাড়া করতে চাইলে নিচের "হাতে ইনস্টল" অংশ দেখুন।
 
-1. রিপোজিটরিটা ডাউনলোড করুন (`git clone` অথবা ZIP), তারপর ফোল্ডারে ঢুকুন।
-2. installer চালান:
+1. [এই লিংক থেকে ZIP নামান](https://github.com/Raju0131/gemini-skill/archive/refs/heads/claude/clever-mendel-r8p88b.zip)। তারপর ZIP-এর ওপর right-click করে Extract All করুন। `gemini-skill-claude-clever-mendel-r8p88b` নামে একটা ফোল্ডার পাবেন।
+2. ওই ফোল্ডারে terminal খুলে installer চালান:
+   - **Windows:** ফোল্ডারটা খুলুন। ওপরের address bar-এ ক্লিক করে `powershell` লিখে Enter চাপুন, ওই ফোল্ডারেই PowerShell খুলবে।
+   - **Mac:** Terminal খুলে `cd ` লিখুন (শেষে একটা space), ফোল্ডারটা টেনে এনে Terminal-এ ছাড়ুন, তারপর Enter চাপুন।
+
+   এরপর এই কমান্ড লিখে Enter চাপুন:
 
    ```bash
    # macOS / Linux
@@ -97,6 +101,8 @@ Skill আর rule-এর নির্দেশগুলো মডেলের �
    # Windows (PowerShell)
    py install.py --with-hooks --with-verifier
    ```
+
+   শেষে `Installed` লেখা দেখলে বুঝবেন কাজ হয়েছে। Windows-এ `py` কাজ না করলে তার জায়গায় `python` লিখুন।
 
    আগে শুধু দেখতে চাইলে যে কী কী বদলাবে, সঙ্গে `--dry-run` দিন। installer-এর বার্তা ইংরেজিতে আসবে: `create` মানে নতুন বানানো, `update` মানে বদলানো, `backup` মানে পুরোনো ফাইলের কপি রাখা।
 
