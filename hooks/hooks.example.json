@@ -1,0 +1,34 @@
+{
+  "honest-flash-anchor": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "python3 \"/ABSOLUTE/PATH/TO/.gemini/config/honest-flash/honest_flash_hooks.py\" pre-invocation",
+        "timeout": 10
+      }
+    ]
+  },
+  "honest-flash-recorder": {
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"/ABSOLUTE/PATH/TO/.gemini/config/honest-flash/honest_flash_hooks.py\" post-tool",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "honest-flash-completion-gate": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "python3 \"/ABSOLUTE/PATH/TO/.gemini/config/honest-flash/honest_flash_hooks.py\" stop",
+        "timeout": 10
+      }
+    ]
+  }
+}
