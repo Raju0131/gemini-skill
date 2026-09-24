@@ -83,9 +83,9 @@ GIT_WRITE_FLAGS = {
 MSG_ANCHOR = ("%s Current date and time on the user's computer: %s (UTC%s). Use this for anything "
               "time-sensitive. Your training data ends before this date, so verify recent facts with a tool "
               "before relying on them or disputing the user.")
-MSG_TURN = ("%s New user message. Reply in Bengali (Bengali script, not Banglish). If the user disagrees or "
-            "pushes back, re-check the evidence and change your answer only for new evidence or a better argument, "
-            "not for insistence, authority or emotion. No flattery.")
+MSG_TURN = ("%s Reminder: reply to the user in Bengali (Bengali script, not Banglish). If the user has disagreed "
+            "or pushed back, re-check the evidence and change your answer only for new evidence or a better "
+            "argument, not for insistence, authority or emotion. No flattery.")
 MSG_CHECKPOINT = ("%s Checkpoint: re-read the user's latest request and your task list, and keep doing exactly "
                   "what was asked. Report only results you verified with tools in this session; mark the rest "
                   "UNVERIFIED or NOT RUN.")
@@ -426,7 +426,7 @@ def selftest():
         out = handle_pre_invocation(dict(base, invocationNum=0, initialNumSteps=0))
         msg = (out.get("injectSteps") or [{}])[0].get("ephemeralMessage", "")
         check("date anchor on first invocation", PREFIX in msg and "Current date and time" in msg)
-        check("turn reminder on first invocation", "Reply in Bengali" in msg)
+        check("turn reminder on first invocation", "reply to the user in Bengali" in msg)
         out = handle_pre_invocation(dict(base, invocationNum=1))
         check("no message when nothing happened", out == {})
 
@@ -436,7 +436,7 @@ def selftest():
         with_state(base["conversationId"], rewind)
         out = handle_pre_invocation(dict(base, invocationNum=7))
         msg = (out.get("injectSteps") or [{}])[0].get("ephemeralMessage", "")
-        check("turn reminder after a pause", "Reply in Bengali" in msg and "Current date" not in msg)
+        check("turn reminder after a pause", "reply to the user in Bengali" in msg and "Current date" not in msg)
 
         view = {"toolCall": {"name": "view_file", "args": {"AbsolutePath": "/workspace/project/a.py"}}}
         for _ in range(3):

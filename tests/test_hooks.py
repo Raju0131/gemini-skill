@@ -42,7 +42,7 @@ class HooksTest(unittest.TestCase):
 
     def test_turn_reminder_first_call_and_after_pause(self):
         msg = self.message(self.hook("pre-invocation", dict(self.base, invocationNum=0)))
-        self.assertIn("Reply in Bengali", msg)
+        self.assertIn("reply to the user in Bengali", msg)
         self.assertEqual(self.hook("pre-invocation", dict(self.base, invocationNum=1)), {})
         path = os.path.join(self.state, "conv-1.json")
         with open(path) as fh:
@@ -51,8 +51,8 @@ class HooksTest(unittest.TestCase):
         with open(path, "w") as fh:
             json.dump(state, fh)
         msg = self.message(self.hook("pre-invocation", dict(self.base, invocationNum=2)))
-        self.assertIn("Reply in Bengali", msg)
-        self.assertIn("pushes back", msg)
+        self.assertIn("reply to the user in Bengali", msg)
+        self.assertIn("pushed back", msg)
 
     def test_loop_warning_resets_after_edit(self):
         for _ in range(3):
