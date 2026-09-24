@@ -117,5 +117,6 @@ command(Get-Location)
 ## ৬. মডেল আর মোড
 
 - কোডিং আর বহু-ধাপের কাজে Gemini 3.8 Flash-এর **Medium** thinking রাখুন, আর কঠিন কাজে **High**। Google নিজেই জটিল কোড আর এজেন্টের কাজে Medium সুপারিশ করে। Low শুধু দ্রুত প্রশ্নোত্তরের জন্য।
+- খুব গুরুত্বপূর্ণ বা ঝুঁকির কাজে মডেল তালিকা থেকে **Claude Opus 4.6 (thinking)** বেছে নিতে পারেন। Free, Google AI Plus, Pro আর Ultra প্ল্যানে আছে, Enterprise-এ নেই। এই skill সেখানেও কাজ করবে।
 - বড় কাজে **Planning mode** ব্যবহার করুন। এতে কাজ শুরুর আগেই পরিকল্পনা (Implementation Plan) দেখে সংশোধন করতে পারবেন।
 - কাজ শুরুর আগে git commit বা ব্যাকআপ রাখুন।

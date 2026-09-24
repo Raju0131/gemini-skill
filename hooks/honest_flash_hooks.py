@@ -5,8 +5,10 @@ One subcommand per hook event. Antigravity sends the event as JSON on stdin and
 reads a JSON answer from stdout (see https://antigravity.google/docs/hooks).
 
   pre-invocation  PreInvocation. Injects an ephemeral system message with the
-                  real date and time from this computer, loop warnings, error
-                  streak warnings and a periodic "stay on task" checkpoint.
+                  real date and time from this computer, a reminder at the
+                  start of each user turn (reply in Bengali, hold evidence-based
+                  positions), loop warnings, error streak warnings and a
+                  periodic "stay on task" checkpoint.
   post-tool       PostToolUse. Records each tool call (name, hash of the
                   arguments, error flag, whether it changed state) for the
                   other two hooks. Always answers {}.
@@ -42,6 +44,7 @@ LOOP_REPEAT = 3
 ERROR_STREAK = 3
 CHECKPOINT_EVERY = 15
 ANCHOR_REFRESH_SECONDS = 20 * 60
+TURN_GAP_SECONDS = 90  # a pause this long between model calls usually means a new user message
 STATE_TTL_SECONDS = 3 * 24 * 3600
 
 EDIT_TOOLS = {"write_to_file", "replace_file_content", "multi_replace_file_content"}
@@ -80,6 +83,9 @@ GIT_WRITE_FLAGS = {
 MSG_ANCHOR = ("%s Current date and time on the user's computer: %s (UTC%s). Use this for anything "
               "time-sensitive. Your training data ends before this date, so verify recent facts with a tool "
               "before relying on them or disputing the user.")
+MSG_TURN = ("%s New user message. Reply in Bengali (Bengali script, not Banglish). If the user disagrees or "
+            "pushes back, re-check the evidence and change your answer only for new evidence or a better argument, "
+            "not for insistence, authority or emotion. No flattery.")
 MSG_CHECKPOINT = ("%s Checkpoint: re-read the user's latest request and your task list, and keep doing exactly "
                   "what was asked. Report only results you verified with tools in this session; mark the rest "
                   "UNVERIFIED or NOT RUN.")
@@ -93,7 +99,8 @@ MSG_GATE = ("%s Completion check before you finish. You changed files or ran sta
             "turn. If you are waiting for the user's answer or plan approval, say so in one line and stop "
             "without doing more work. Otherwise make sure your final message lists: (1) each change with "
             "evidence from this turn (command and result, or a re-read), (2) every check that failed or was "
-            "not run, marked FAILED or NOT RUN, (3) anything requested but not done. If the relevant tests or "
+            "not run, marked FAILED or NOT RUN, (3) anything requested but not done, (4) any mistakes or shortcuts "
+            "you took. Write it in Bengali. If the relevant tests or "
             "checks have not run since your last edit and they are quick and safe, run them now. Never claim "
             "success without evidence. If your last message already did all this, reply with one short line "
             "saying so and stop.")
@@ -114,7 +121,7 @@ def state_path(conversation_id):
 
 def new_state():
     return {"v": 1, "calls": [], "total": 0, "edits": 0, "warned": [], "err_warned_at": -1,
-            "anchor_t": 0.0, "mut": False, "gate_pending": False, "gates": 0}
+            "anchor_t": 0.0, "last_inv_t": 0.0, "mut": False, "gate_pending": False, "gates": 0}
 
 
 def load_state(path):
@@ -334,9 +341,13 @@ def handle_pre_invocation(payload, now=None):
 
     def update(state):
         messages = []
-        if invocation == 0 or time.time() - float(state.get("anchor_t") or 0) > ANCHOR_REFRESH_SECONDS:
+        t = time.time()
+        if invocation == 0 or t - float(state.get("anchor_t") or 0) > ANCHOR_REFRESH_SECONDS:
             messages.append(MSG_ANCHOR % (PREFIX, now.strftime("%A, %d %B %Y, %H:%M"), _utc_offset(now)))
-            state["anchor_t"] = time.time()
+            state["anchor_t"] = t
+        if invocation == 0 or t - float(state.get("last_inv_t") or 0) > TURN_GAP_SECONDS:
+            messages.append(MSG_TURN % PREFIX)
+        state["last_inv_t"] = t
 
         calls = state["calls"]
         last_edit = max([i for i, c in enumerate(calls) if c.get("edit")] or [-1])
@@ -415,8 +426,17 @@ def selftest():
         out = handle_pre_invocation(dict(base, invocationNum=0, initialNumSteps=0))
         msg = (out.get("injectSteps") or [{}])[0].get("ephemeralMessage", "")
         check("date anchor on first invocation", PREFIX in msg and "Current date and time" in msg)
+        check("turn reminder on first invocation", "Reply in Bengali" in msg)
         out = handle_pre_invocation(dict(base, invocationNum=1))
         check("no message when nothing happened", out == {})
+
+        def rewind(state):
+            state["last_inv_t"] = time.time() - TURN_GAP_SECONDS - 5
+            return {}
+        with_state(base["conversationId"], rewind)
+        out = handle_pre_invocation(dict(base, invocationNum=7))
+        msg = (out.get("injectSteps") or [{}])[0].get("ephemeralMessage", "")
+        check("turn reminder after a pause", "Reply in Bengali" in msg and "Current date" not in msg)
 
         view = {"toolCall": {"name": "view_file", "args": {"AbsolutePath": "/workspace/project/a.py"}}}
         for _ in range(3):

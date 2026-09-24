@@ -35,4 +35,4 @@ Summary: <n> verified, <n> failed, <n> unverified
 Other findings:
 - ...
 ```
-Be concise. Do not speculate.
+Write the report in Bengali (Bengali script). Keep file paths, commands and the status words VERIFIED, FAILED and UNVERIFIED as they are. Be concise. Do not speculate. Do not soften a FAILED result to be agreeable.

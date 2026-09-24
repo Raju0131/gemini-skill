@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 import tempfile
 import unittest
@@ -38,6 +39,20 @@ class HooksTest(unittest.TestCase):
     def test_date_anchor_first_invocation_only(self):
         self.assertIn("Current date and time", self.message(self.hook("pre-invocation", dict(self.base, invocationNum=0))))
         self.assertEqual(self.hook("pre-invocation", dict(self.base, invocationNum=1)), {})
+
+    def test_turn_reminder_first_call_and_after_pause(self):
+        msg = self.message(self.hook("pre-invocation", dict(self.base, invocationNum=0)))
+        self.assertIn("Reply in Bengali", msg)
+        self.assertEqual(self.hook("pre-invocation", dict(self.base, invocationNum=1)), {})
+        path = os.path.join(self.state, "conv-1.json")
+        with open(path) as fh:
+            state = json.load(fh)
+        state["last_inv_t"] -= 600
+        with open(path, "w") as fh:
+            json.dump(state, fh)
+        msg = self.message(self.hook("pre-invocation", dict(self.base, invocationNum=2)))
+        self.assertIn("Reply in Bengali", msg)
+        self.assertIn("pushes back", msg)
 
     def test_loop_warning_resets_after_edit(self):
         for _ in range(3):

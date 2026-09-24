@@ -17,7 +17,7 @@ Real incidents with Gemini agents:
 
 ## Rules
 
-1. **Ask first**, unless the user explicitly requested this exact action on this exact target in this conversation. When you ask, show the exact command and the resolved absolute target paths.
+1. **Ask first**, unless the user explicitly requested this exact action on this exact target in this conversation. When you ask, show the exact command and the resolved absolute target paths. The one exception: temporary files you created yourself in this session may be deleted without asking. List them by exact path, never with a wildcard.
 2. **Check every target path.** Resolve it to an absolute path. Confirm it exists, see what it contains (file count and size), and check that it is inside the workspace. Run `scripts/path_guard.py delete|move|write <paths>` from the workspace root and obey its verdict:
    - `VERDICT: OK`: go ahead, if the user asked for it.
    - `VERDICT: ASK_USER`: go ahead only if the user explicitly asked for this exact target in this conversation. Otherwise show the user the details and ask.

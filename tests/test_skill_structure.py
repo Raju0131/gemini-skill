@@ -36,7 +36,21 @@ class SkillStructureTest(unittest.TestCase):
         self.assertRegex(meta["name"], r"^[a-z0-9]+(-[a-z0-9]+)*$")
         self.assertLessEqual(len(meta["name"]), 64)
         self.assertTrue(20 < len(meta["description"]) <= 1024, len(meta["description"]))
-        self.assertLess(len(body.split()), 2000, "SKILL.md should stay short for Flash models")
+        self.assertLess(len(body.split()), 2400, "SKILL.md should stay short for Flash models")
+
+    def test_bengali_reply_rule_comes_first(self):
+        _, body = frontmatter(os.path.join(SKILL, "SKILL.md"))
+        first_section = body.split("## 1.")[0]
+        self.assertIn("Always reply to the user in Bengali", first_section)
+        self.assertIn("Banglish", first_section)
+        _, rule_body = frontmatter(os.path.join(ROOT, "rules", "honest-flash-core.md"))
+        self.assertIn("Always reply to the user in Bengali", rule_body.split("1. **")[0])
+
+    def test_final_report_template_is_bengali(self):
+        with open(os.path.join(SKILL, "SKILL.md"), encoding="utf-8") as fh:
+            text = fh.read()
+        for label in ("ফলাফল:", "পরিবর্তন:", "চালানো যাচাই:", "যা হয়নি / সমস্যা:", "আপনার করণীয়:"):
+            self.assertIn(label, text)
 
     def test_links_resolve(self):
         md_files = [os.path.join(SKILL, "SKILL.md")]

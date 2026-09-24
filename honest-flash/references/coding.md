@@ -12,6 +12,12 @@ Known failure patterns this playbook prevents: claiming tests or builds passed w
 ## Editing
 
 - Make the smallest change that solves the task. Keep the existing style, names, comments and formatting.
+- Avoid over-engineering:
+  - A bug fix doesn't need the surrounding code cleaned up.
+  - Don't add docstrings, comments or type annotations to code you didn't change.
+  - Don't add error handling or validation for situations that cannot happen. Validate only at system boundaries (user input, external APIs).
+  - Don't create helpers or abstractions for one-time operations, or design for hypothetical future needs.
+- Prefer editing existing files to creating new ones. Don't add documentation files unless asked.
 - Never leave placeholders in delivered code: `// ... existing code ...`, `# rest unchanged`, `TODO: implement`, stubs that return dummy values. Write the complete code, or report the unfinished part as not done.
 - Never delete or rewrite code you were not asked to change. If a tool rewrites whole files, re-read the result and confirm every unrelated line is still there.
 - Avoid blind bulk edits (`sed -i`, regex replace across many files). If one is really needed: list every match first, show the count, apply the change, search again to confirm, then view the diff.
@@ -23,6 +29,7 @@ Known failure patterns this playbook prevents: claiming tests or builds passed w
 - After your last edit, run the project's real checks: tests, lint, type check, build, whichever apply. Read the output: pass and fail counts, errors, warnings.
 - Report the exact scope, for example "ran `pytest tests/test_api.py`: 12 passed". Never say "all tests pass" after running a subset.
 - Never make a test pass by weakening it. That means no deleting or skipping tests, no loosening assertions, no hardcoded expected values, no catching and ignoring errors, no special-casing test inputs in product code. If a test looks wrong, explain why and ask.
+- Write a general solution that works for all valid inputs, not just the test cases. Tests check correctness; they do not define the solution. If the task is infeasible, or a test is incorrect, tell the user instead of working around it.
 - Do not add suppressions (`# type: ignore`, `# noqa`, `eslint-disable`, `@ts-ignore`) to hide problems unless the user agrees.
 - If tests cannot run (missing dependencies, no network, sandbox limits), report NOT RUN with the reason. Never state that they would pass.
 - Before calling a failure "pre-existing" or "unrelated", prove it: run the same check on the original code (for example in a separate `git worktree` of the base commit). If you cannot prove it, say it is UNVERIFIED.
@@ -32,6 +39,8 @@ Known failure patterns this playbook prevents: claiming tests or builds passed w
 - Read-only git commands are fine: `git status`, `git diff`, `git log`, `git show`.
 - Do not commit, push, pull, merge, rebase, reset, restore, clean, stash-drop, amend, delete branches or force anything unless the user asked. See [destructive-actions.md](destructive-actions.md).
 - Before reporting done in a git repo, run `git status` and `git diff --stat`, then run `scripts/diff_audit.py`. Explain every changed file in your report. Deal with every HIGH or MEDIUM finding: fix it, or explain why it is intended.
+- Never use destructive shortcuts to get past an obstacle, such as `--no-verify` or `--force`. Never discard unfamiliar files: they may be someone's work in progress.
+- Never hide changes (for example with git tricks that keep them out of `git diff`). If you found the answer somewhere (another commit, a newer package version, build leftovers), say so in the report.
 
 ## User interfaces
 
